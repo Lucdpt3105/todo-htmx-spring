@@ -114,8 +114,35 @@ Open [http://localhost:8080](http://localhost:8080).
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `DATABASE_URL` | Yes | - | PostgreSQL URL (`postgres://` or `postgresql://`) |
+| `DATABASE_URL` | Yes | - | PostgreSQL URL (`postgres://` or `postgresql://`); on Railway reference `${{Postgres.DATABASE_URL}}` |
 | `PORT` | No | `8080` | HTTP port |
+
+<br>
+
+## Railway template: PostgreSQL service variables
+
+Use one variable per line when defining the **PostgreSQL** plugin service. The **web** service typically references the plugin’s canonical URL (see last lines). Generate **`POSTGRES_PASSWORD`** with Railway’s secret helper — do not commit real passwords.
+
+**Template icon (Railway):** [assets/icon.svg](https://raw.githubusercontent.com/atoolz/railway-htmx-java-spring-thymeleaf-pg/master/assets/icon.svg)
+
+```bash
+PGDATA="" # data directory (volume); often set by the image
+PGHOST="${{RAILWAY_PRIVATE_DOMAIN}}" # private hostname for other Railway services
+PGPORT="" # omit for default 5432, or set explicitly
+PGUSER="${{POSTGRES_USER}}" # DB role; keep aligned with POSTGRES_USER
+PGDATABASE="${{POSTGRES_DB}}" # database name
+PGPASSWORD="${{POSTGRES_PASSWORD}}" # password for PGUSER
+POSTGRES_DB="" # DB created on first init (official image / plugin)
+DATABASE_URL="postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}" # in-cluster connection string
+POSTGRES_USER="" # superuser name on first init
+SSL_CERT_DAYS="" # optional TLS cert lifetime if you generate certs
+POSTGRES_PASSWORD="${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}" # generated root password
+DATABASE_PUBLIC_URL="postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{PGDATABASE}}" # TCP proxy for external clients
+RAILWAY_DEPLOYMENT_DRAINING_SECONDS="" # drain window during deploys
+
+# Web service (Spring Boot) — reference the Postgres plugin:
+DATABASE_URL="${{Postgres.DATABASE_URL}}" # postgres:// or postgresql://; parsed by RailwayDataSourceConfig
+```
 
 <br>
 
