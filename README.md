@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://railway.com/deploy/htmx-spring-thymeleaf-postgres">
+  <a href="https://railway.com/deploy/htmxspringthymeleafpostgres">
     <img src="https://railway.com/button.svg" alt="Deploy on Railway">
   </a>
 </p>
