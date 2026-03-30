@@ -9,14 +9,13 @@
     </filter>
   </defs>
 
-  <!-- Background (Spring-inspired light greens; brand ~#6DB33F) -->
+  <!-- Background (light); accent + logo use #005f0f -->
   <rect width="512" height="512" rx="80" fill="url(#bg)"/>
 
   <ellipse cx="160" cy="200" rx="180" ry="160" fill="#f4fff0" opacity="0.6" filter="url(#s)"/>
-  <ellipse cx="380" cy="350" rx="150" ry="130" fill="#6db33f" opacity="0.2" filter="url(#s)"/>
+  <ellipse cx="380" cy="350" rx="150" ry="130" fill="#005f0f" opacity="0.22" filter="url(#s)"/>
 
-  <!-- HTMX logo (dark green for contrast on light background) -->
-  <g transform="translate(64, 104) scale(16)" fill="#2f5f1f">
+  <g transform="translate(64, 104) scale(16)" fill="#005f0f">
     <path d="M0 13.01v-2l7.09-2.98.58 1.94-5.1 2.05 5.16 2.05-.63 1.9Zm16.37 1.03 5.18-2-5.16-2.09.65-1.88L24 10.95v2.12L17 16zm-2.85-9.98H16l-5.47 15.88H8.05Z"/>
   </g>
 </svg>
