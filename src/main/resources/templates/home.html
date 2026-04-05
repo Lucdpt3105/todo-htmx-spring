@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
-<div class="max-w-2xl mx-auto px-4 py-12">
+<div class="max-w-3xl mx-auto px-4 py-12">
   <h1 class="text-3xl font-bold mb-2">Todo App</h1>
   <p class="text-gray-400 mb-8">HTMX + Spring Boot + Thymeleaf + PostgreSQL</p>
 
@@ -17,22 +17,78 @@
     hx-target="#todo-list"
     hx-swap="afterbegin"
     hx-on::after-request="if(event.detail.successful) this.reset(); document.getElementById('empty-state')?.remove()"
-    class="flex gap-2 mb-6"
+    class="mb-8 p-4 bg-gray-800 rounded-lg border border-gray-700"
   >
-    <input
-      type="text"
-      name="title"
-      required
-      placeholder="What needs to be done?"
-      class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500"
-    />
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+      <div class="md:col-span-2">
+        <input
+          type="text"
+          name="title"
+          required
+          placeholder="What needs to be done?"
+          class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+        />
+      </div>
+      <select
+        name="priority"
+        class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500"
+      >
+        <option value="LOW">Low Priority</option>
+        <option value="MEDIUM" selected>Medium Priority</option>
+        <option value="HIGH">High Priority</option>
+      </select>
+      <input
+        type="date"
+        name="dueDate"
+        class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500"
+      />
+    </div>
     <button
       type="submit"
-      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium transition-colors"
     >
-      Add
+      Add Todo
     </button>
   </form>
+
+  <!-- Filters -->
+  <div class="flex gap-2 mb-6 flex-wrap">
+    <a
+      href="/?filter=all"
+      th:classappend="${currentFilter == 'all'} ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'"
+      class="px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+    >All</a>
+    <a
+      href="/?filter=active"
+      th:classappend="${currentFilter == 'active'} ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'"
+      class="px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+    >Active</a>
+    <a
+      href="/?filter=completed"
+      th:classappend="${currentFilter == 'completed'} ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'"
+      class="px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+    >Completed</a>
+    <div class="flex-1"></div>
+    <a
+      href="/?priority=HIGH"
+      th:classappend="${currentPriority == 'HIGH'} ? 'bg-red-600' : 'bg-gray-700 hover:bg-gray-600'"
+      class="px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+    >High</a>
+    <a
+      href="/?priority=MEDIUM"
+      th:classappend="${currentPriority == 'MEDIUM'} ? 'bg-yellow-600' : 'bg-gray-700 hover:bg-gray-600'"
+      class="px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+    >Medium</a>
+    <a
+      href="/?priority=LOW"
+      th:classappend="${currentPriority == 'LOW'} ? 'bg-green-600' : 'bg-gray-700 hover:bg-gray-600'"
+      class="px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+    >Low</a>
+    <a
+      href="/"
+      class="px-4 py-2 rounded text-sm font-medium bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer"
+    >Reset</a>
+  </div>
 
   <div id="todo-list">
     <th:block th:each="todo : ${todos}">

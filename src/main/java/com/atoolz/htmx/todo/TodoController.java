@@ -1,6 +1,8 @@
 package com.atoolz.htmx.todo;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +27,55 @@ public class TodoController {
   }
 
   @GetMapping("/")
-  public String home(Model model) {
-    model.addAttribute("todos", todos.findAllByOrderByCreatedAtDesc());
+  public String home(
+      @RequestParam(value = "filter", required = false, defaultValue = "all") String filter,
+      @RequestParam(value = "priority", required = false) String priority,
+      Model model) {
+    List<Todo> todoList;
+
+    if ("completed".equals(filter)) {
+      todoList = todos.findByCompletedOrderByPriorityDescCreatedAtDesc(true);
+    } else if ("active".equals(filter)) {
+      todoList = todos.findByCompletedOrderByPriorityDescCreatedAtDesc(false);
+    } else if (priority != null && !priority.isBlank()) {
+      todoList = todos.findByPriorityOrderByCreatedAtDesc(Todo.Priority.valueOf(priority.toUpperCase()));
+    } else {
+      todoList = todos.findAllByOrderByCreatedAtDesc();
+    }
+
+    model.addAttribute("todos", todoList);
+    model.addAttribute("currentFilter", filter);
+    model.addAttribute("currentPriority", priority);
     return "home";
   }
 
   @PostMapping("/todos")
   @org.springframework.web.bind.annotation.ResponseStatus(HttpStatus.CREATED)
   public String create(
-      @RequestParam(value = "title", required = false) String title, Model model) {
+      @RequestParam(value = "title", required = false) String title,
+      @RequestParam(value = "priority", required = false, defaultValue = "MEDIUM") String priority,
+      @RequestParam(value = "dueDate", required = false) String dueDate,
+      Model model) {
     if (title == null || title.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "title is required");
     }
-    Todo todo = new Todo(title.trim(), false, Instant.now());
+
+    LocalDate due = null;
+    if (dueDate != null && !dueDate.isBlank()) {
+      try {
+        due = LocalDate.parse(dueDate);
+      } catch (Exception e) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid dueDate format");
+      }
+    }
+
+    Todo todo = new Todo(
+        title.trim(),
+        false,
+        Todo.Priority.valueOf(priority.toUpperCase()),
+        due,
+        Instant.now()
+    );
     todos.save(todo);
     model.addAttribute("todo", todo);
     return "fragments/todo-item :: todoRow";

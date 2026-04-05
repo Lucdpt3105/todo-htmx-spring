@@ -2,9 +2,11 @@
   xmlns:th="http://www.thymeleaf.org"
   th:fragment="todoRow (todo)"
   th:id="'todo-' + ${todo.id}"
-  class="flex items-center justify-between p-4 bg-gray-800 rounded-lg mb-2 group"
+  th:classappend="${todo.completed} ? 'opacity-60' : ''"
+  class="flex items-center justify-between p-4 bg-gray-800 rounded-lg mb-2 group border-l-4"
+  th:style="'border-left-color: ' + (${#strings.equals(todo.priority.toString(), 'HIGH')} ? '#dc2626' : ${#strings.equals(todo.priority.toString(), 'MEDIUM')} ? '#eab308' : '#16a34a')"
 >
-  <div class="flex items-center gap-3">
+  <div class="flex items-center gap-3 flex-1">
     <input
       type="checkbox"
       th:checked="${todo.completed}"
@@ -12,16 +14,33 @@
       hx-swap="outerHTML"
       class="w-5 h-5 rounded bg-gray-700 border-gray-600 cursor-pointer"
     />
-    <span
-      th:classappend="${todo.completed} ? 'text-gray-500 line-through' : 'text-gray-100'"
-      th:text="${todo.title}"
-    >title</span>
+    <div class="flex-1">
+      <span
+        th:classappend="${todo.completed} ? 'text-gray-500 line-through' : 'text-gray-100'"
+        th:text="${todo.title}"
+        class="block font-medium"
+      >title</span>
+      <div class="flex gap-2 mt-1 flex-wrap">
+        <span
+          th:if="${todo.priority}"
+          th:classappend="${#strings.equals(todo.priority.toString(), 'HIGH')} ? 'bg-red-900 text-red-200' : ${#strings.equals(todo.priority.toString(), 'MEDIUM')} ? 'bg-yellow-900 text-yellow-200' : 'bg-green-900 text-green-200'"
+          class="text-xs px-2 py-1 rounded"
+          th:text="${todo.priority}"
+        ></span>
+        <span
+          th:if="${todo.dueDate}"
+          th:classappend="${#temporals.daysBetween(#dates.createToday(), todo.dueDate) <= 0} ? 'bg-red-900 text-red-200' : 'bg-gray-700 text-gray-300'"
+          class="text-xs px-2 py-1 rounded"
+          th:text="'📅 ' + ${#temporals.format(todo.dueDate, 'dd/MM/yyyy')}"
+        ></span>
+      </div>
+    </div>
   </div>
   <button
     type="button"
     th:attr="hx-delete=|/todos/${todo.id}|,hx-target=|#todo-${todo.id}|"
     hx-swap="outerHTML"
-    class="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+    class="text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all cursor-pointer flex-shrink-0"
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
       <path fill-rule="evenodd"
