@@ -95,8 +95,4 @@ public class Todo {
   public void setTitle(String title) {
     this.title = title;
   }
-
-  public void setCompleted(boolean completed) {
-    this.completed = completed;
-  }
 }
