@@ -2,8 +2,8 @@
   xmlns:th="http://www.thymeleaf.org"
   th:fragment="todoRow (todo)"
   th:id="'todo-' + ${todo.id}"
-  th:classappend="${todo.completed} ? 'opacity-60' : ''"
   class="flex items-center justify-between p-4 bg-gray-800 rounded-lg mb-2 group border-l-4"
+  th:classappend="${todo.completed} ? 'opacity-60' : ''"
   th:style="'border-left-color: ' + (${#strings.equals(todo.priority.toString(), 'HIGH')} ? '#dc2626' : ${#strings.equals(todo.priority.toString(), 'MEDIUM')} ? '#eab308' : '#16a34a')"
 >
   <div class="flex items-center gap-3 flex-1">
