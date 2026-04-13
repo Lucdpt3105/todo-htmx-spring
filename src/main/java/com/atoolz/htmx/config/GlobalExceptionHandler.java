@@ -3,11 +3,13 @@ package com.atoolz.htmx.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,9 +26,26 @@ public class GlobalExceptionHandler {
     return "error";
   }
 
+  // 404 từ Spring MVC khi không tìm thấy route (Spring Boot 3.x)
+  @ExceptionHandler(NoResourceFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public String handleNoResource(NoResourceFoundException ex, Model model) {
+    log.warn("404 — {}", ex.getMessage());
+    model.addAttribute("status", 404);
+    model.addAttribute("error", "Not Found");
+    model.addAttribute("message", "The page you are looking for does not exist.");
+    return "error";
+  }
+
+  // Chỉ bắt Exception thuần, KHÔNG bắt các Spring MVC internal exceptions
+  // để tránh conflict với @ResponseBody endpoints (như /health)
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public String handleGeneral(Exception ex, Model model) {
+  public Object handleGeneral(Exception ex, Model model) {
+    // Bỏ qua các exception của Spring MVC framework — để framework tự xử lý
+    if (ex instanceof HttpMessageNotWritableException) {
+      throw new RuntimeException(ex); // re-throw để servlet container xử lý
+    }
     log.error("Unexpected error: {}", ex.getMessage(), ex);
     model.addAttribute("status", 500);
     model.addAttribute("error", "Internal Server Error");
