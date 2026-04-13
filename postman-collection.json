@@ -1,0 +1,272 @@
+{
+  "info": {
+    "name": "Todo App — HTMX Spring Boot",
+    "description": "API collection cho Todo App (HTMX + Spring Boot + Thymeleaf + PostgreSQL).\n\nCách dùng:\n1. Import file này vào Postman\n2. Chọn Environment (Local hoặc Railway)\n3. Chạy từng request hoặc dùng Collection Runner",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "description": "Đổi thành URL Railway khi test production"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Kiểm tra app + DB còn sống không.\nExpected: 200 OK { \"status\": \"healthy\" }"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Todos — List",
+      "item": [
+        {
+          "name": "GET / (all todos)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Load trang chủ — tất cả todos"
+          }
+        },
+        {
+          "name": "GET / (filter=active)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/?filter=active",
+              "host": ["{{baseUrl}}"],
+              "path": [""],
+              "query": [{ "key": "filter", "value": "active" }]
+            }
+          }
+        },
+        {
+          "name": "GET / (filter=completed)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/?filter=completed",
+              "host": ["{{baseUrl}}"],
+              "path": [""],
+              "query": [{ "key": "filter", "value": "completed" }]
+            }
+          }
+        },
+        {
+          "name": "GET / (priority=HIGH)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/?priority=HIGH",
+              "host": ["{{baseUrl}}"],
+              "path": [""],
+              "query": [{ "key": "priority", "value": "HIGH" }]
+            }
+          }
+        },
+        {
+          "name": "GET / (priority=MEDIUM)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/?priority=MEDIUM",
+              "host": ["{{baseUrl}}"],
+              "path": [""],
+              "query": [{ "key": "priority", "value": "MEDIUM" }]
+            }
+          }
+        },
+        {
+          "name": "GET / (priority=LOW)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/?priority=LOW",
+              "host": ["{{baseUrl}}"],
+              "path": [""],
+              "query": [{ "key": "priority", "value": "LOW" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Todos — Create",
+      "item": [
+        {
+          "name": "POST /todos (simple)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "title", "value": "Buy groceries", "description": "Required" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos"]
+            },
+            "description": "Tạo todo đơn giản — priority mặc định là MEDIUM"
+          }
+        },
+        {
+          "name": "POST /todos (HIGH priority)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "title", "value": "Fix critical bug" },
+                { "key": "priority", "value": "HIGH" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos"]
+            }
+          }
+        },
+        {
+          "name": "POST /todos (with due date)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "title", "value": "Submit report" },
+                { "key": "priority", "value": "MEDIUM" },
+                { "key": "dueDate", "value": "2026-12-31", "description": "Format: YYYY-MM-DD" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos"]
+            }
+          }
+        },
+        {
+          "name": "POST /todos — Error: missing title (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "title", "value": "" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos"]
+            },
+            "description": "Expected: 400 Bad Request"
+          }
+        },
+        {
+          "name": "POST /todos — Error: invalid dueDate (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "title", "value": "Test" },
+                { "key": "dueDate", "value": "not-a-date" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/todos",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos"]
+            },
+            "description": "Expected: 400 Bad Request"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Todos — Toggle & Delete",
+      "item": [
+        {
+          "name": "PATCH /todos/:id/toggle",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/todos/1/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos", "1", "toggle"],
+              "variable": [
+                { "key": "id", "value": "1", "description": "Đổi thành ID thực từ DB" }
+              ]
+            },
+            "description": "Toggle trạng thái completed. Trả về HTML fragment (todoRow).\nExpected: 200 OK + HTML"
+          }
+        },
+        {
+          "name": "PATCH /todos/:id/toggle — Error: not found (404)",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/todos/999999/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos", "999999", "toggle"]
+            },
+            "description": "Expected: 404 Not Found"
+          }
+        },
+        {
+          "name": "DELETE /todos/:id",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/todos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["todos", "1"],
+              "variable": [
+                { "key": "id", "value": "1", "description": "Đổi thành ID thực từ DB" }
+              ]
+            },
+            "description": "Xóa todo. Expected: 200 OK"
+          }
+        }
+      ]
+    }
+  ]
+}

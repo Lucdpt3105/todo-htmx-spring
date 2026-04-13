@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class TodoController {
+
+  private static final Logger log = LoggerFactory.getLogger(TodoController.class);
 
   private final TodoRepository todos;
 
@@ -50,7 +54,6 @@ public class TodoController {
   }
 
   @PostMapping("/todos")
-  @org.springframework.web.bind.annotation.ResponseStatus(HttpStatus.CREATED)
   public String create(
       @RequestParam(value = "title", required = false) String title,
       @RequestParam(value = "priority", required = false, defaultValue = "MEDIUM") String priority,

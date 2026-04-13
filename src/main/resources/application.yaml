@@ -2,11 +2,6 @@ server:
   port: ${PORT:8080}
 
 spring:
-  datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/todos}
-    username: ${DATABASE_USER:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
@@ -17,10 +12,11 @@ spring:
         jdbc:
           time_zone: UTC
   thymeleaf:
-    cache: true
+    cache: false
   flyway:
     enabled: true
 
 logging:
   level:
     root: INFO
+    com.atoolz.htmx: DEBUG

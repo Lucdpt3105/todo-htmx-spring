@@ -1,5 +1,15 @@
 version: '3.8'
 
+# ─────────────────────────────────────────────
+#  LOCAL DEV: chỉ chạy PostgreSQL
+#  $ docker compose up -d postgres
+#  Sau đó chạy app bằng IDE / mvn spring-boot:run
+#
+#  FULL STACK: build + chạy cả app lẫn DB
+#  $ docker build -t todo-app:latest .
+#  $ docker compose --profile full up -d
+# ─────────────────────────────────────────────
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -19,9 +29,11 @@ services:
       retries: 5
 
   app:
+    profiles: ["full"]
     image: todo-app:latest
     container_name: todo-app
     environment:
+      # Dùng postgresql:// (không phải postgres://) khi kết nối nội bộ Docker
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/todos?sslmode=disable
       PORT: 8080
     ports:

@@ -1,0 +1,157 @@
+### =============================================
+### Todo App — API Test File
+### Compatible with: IntelliJ HTTP Client, VS Code REST Client
+### =============================================
+### Usage:
+###   - IntelliJ: Open this file → click "Run" next to each request
+###   - VS Code: Install "REST Client" extension → click "Send Request"
+###
+### Set your base URL below:
+###   - Local:   http://localhost:8080
+###   - Railway: https://your-app.railway.app
+
+@baseUrl = http://localhost:8080
+
+### =============================================
+### 1. Health Check
+### =============================================
+
+### GET /health — Check app + DB connectivity
+GET {{baseUrl}}/health
+Accept: application/json
+
+###
+
+### =============================================
+### 2. Home / List Todos
+### =============================================
+
+### GET / — Load home page (all todos)
+GET {{baseUrl}}/
+Accept: text/html
+
+###
+
+### GET /?filter=active — Filter only active todos
+GET {{baseUrl}}/?filter=active
+Accept: text/html
+
+###
+
+### GET /?filter=completed — Filter only completed todos
+GET {{baseUrl}}/?filter=completed
+Accept: text/html
+
+###
+
+### GET /?priority=HIGH — Filter by HIGH priority
+GET {{baseUrl}}/?priority=HIGH
+Accept: text/html
+
+###
+
+### GET /?priority=MEDIUM — Filter by MEDIUM priority
+GET {{baseUrl}}/?priority=MEDIUM
+Accept: text/html
+
+###
+
+### GET /?priority=LOW — Filter by LOW priority
+GET {{baseUrl}}/?priority=LOW
+Accept: text/html
+
+###
+
+### =============================================
+### 3. Create Todo
+### =============================================
+
+### POST /todos — Create a simple todo (title only)
+POST {{baseUrl}}/todos
+Content-Type: application/x-www-form-urlencoded
+
+title=Buy groceries
+
+###
+
+### POST /todos — Create with HIGH priority
+POST {{baseUrl}}/todos
+Content-Type: application/x-www-form-urlencoded
+
+title=Fix critical bug&priority=HIGH
+
+###
+
+### POST /todos — Create with due date (MEDIUM priority)
+POST {{baseUrl}}/todos
+Content-Type: application/x-www-form-urlencoded
+
+title=Submit report&priority=MEDIUM&dueDate=2026-12-31
+
+###
+
+### POST /todos — Create with LOW priority and past due date (should show red)
+POST {{baseUrl}}/todos
+Content-Type: application/x-www-form-urlencoded
+
+title=Overdue task&priority=LOW&dueDate=2020-01-01
+
+###
+
+### POST /todos — Error: missing title (expect 400)
+POST {{baseUrl}}/todos
+Content-Type: application/x-www-form-urlencoded
+
+title=
+
+###
+
+### POST /todos — Error: invalid dueDate format (expect 400)
+POST {{baseUrl}}/todos
+Content-Type: application/x-www-form-urlencoded
+
+title=Test invalid date&dueDate=not-a-date
+
+###
+
+### =============================================
+### 4. Toggle Todo Completion
+### Replace {id} with an actual todo ID from the DB
+### =============================================
+
+### PATCH /todos/{id}/toggle — Toggle completion status
+# @name toggleTodo
+PATCH {{baseUrl}}/todos/1/toggle
+Content-Type: application/x-www-form-urlencoded
+
+###
+
+### =============================================
+### 5. Delete Todo
+### Replace {id} with an actual todo ID from the DB
+### =============================================
+
+### DELETE /todos/{id} — Delete a todo
+DELETE {{baseUrl}}/todos/1
+
+###
+
+### =============================================
+### 6. Error Cases
+### =============================================
+
+### GET /non-existent-page — Should return 404 via GlobalExceptionHandler (not Whitelabel)
+GET {{baseUrl}}/this-route-does-not-exist
+Accept: text/html
+
+###
+
+### PATCH /todos/999999/toggle — Non-existent todo ID (expect 404)
+PATCH {{baseUrl}}/todos/999999/toggle
+
+###
+
+### DELETE /todos/999999 — Non-existent todo ID (silent 200 OK — deleteById doesn't throw)
+DELETE {{baseUrl}}/todos/999999
+
+###

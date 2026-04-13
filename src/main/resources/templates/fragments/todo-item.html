@@ -29,7 +29,7 @@
         ></span>
         <span
           th:if="${todo.dueDate}"
-          th:classappend="${#temporals.daysBetween(#dates.createToday(), todo.dueDate) <= 0} ? 'bg-red-900 text-red-200' : 'bg-gray-700 text-gray-300'"
+          th:classappend="${#temporals.daysBetween(#temporals.createToday(), todo.dueDate) <= 0} ? 'bg-red-900 text-red-200' : 'bg-gray-700 text-gray-300'"
           class="text-xs px-2 py-1 rounded"
           th:text="'📅 ' + ${#temporals.format(todo.dueDate, 'dd/MM/yyyy')}"
         ></span>
