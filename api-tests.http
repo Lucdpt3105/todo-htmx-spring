@@ -8,9 +8,14 @@
 ###
 ### Set your base URL below:
 ###   - Local:   http://localhost:8080
-###   - Railway: https://your-app.railway.app
+###   - Railway: https://sublime-comfort-production.up.railway.app/
 
 @baseUrl = http://localhost:8080
+
+### Cookie Setup (For User Isolation)
+### To act as a specific "client" or "browser", include this header in requests:
+### Cookie: todo_client_id=test-client-123
+### The server automatically assigns one via Set-Cookie if missing.
 
 ### =============================================
 ### 1. Health Check

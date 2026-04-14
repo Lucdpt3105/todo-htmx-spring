@@ -1,0 +1,1 @@
+ALTER TABLE todos ADD COLUMN user_id VARCHAR(255) NOT NULL DEFAULT 'anonymous';

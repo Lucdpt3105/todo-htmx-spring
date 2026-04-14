@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @Controller
 public class TodoController {
@@ -30,21 +34,36 @@ public class TodoController {
     this.todos = todos;
   }
 
+  private String getOrGenerateClientId(String clientId, HttpServletResponse response) {
+    if (clientId == null || clientId.isBlank()) {
+      clientId = UUID.randomUUID().toString();
+      Cookie cookie = new Cookie("todo_client_id", clientId);
+      cookie.setPath("/");
+      cookie.setMaxAge(60 * 60 * 24 * 365); // 1 year
+      cookie.setHttpOnly(true);
+      response.addCookie(cookie);
+    }
+    return clientId;
+  }
+
   @GetMapping("/")
   public String home(
+      @CookieValue(value = "todo_client_id", required = false) String clientId,
+      HttpServletResponse response,
       @RequestParam(value = "filter", required = false, defaultValue = "all") String filter,
       @RequestParam(value = "priority", required = false) String priority,
       Model model) {
+    String currentClientId = getOrGenerateClientId(clientId, response);
     List<Todo> todoList;
 
     if ("completed".equals(filter)) {
-      todoList = todos.findByCompletedOrderByPriorityDescCreatedAtDesc(true);
+      todoList = todos.findByUserIdAndCompletedOrderByPriorityDescCreatedAtDesc(currentClientId, true);
     } else if ("active".equals(filter)) {
-      todoList = todos.findByCompletedOrderByPriorityDescCreatedAtDesc(false);
+      todoList = todos.findByUserIdAndCompletedOrderByPriorityDescCreatedAtDesc(currentClientId, false);
     } else if (priority != null && !priority.isBlank()) {
-      todoList = todos.findByPriorityOrderByCreatedAtDesc(Todo.Priority.valueOf(priority.toUpperCase()));
+      todoList = todos.findByUserIdAndPriorityOrderByCreatedAtDesc(currentClientId, Todo.Priority.valueOf(priority.toUpperCase()));
     } else {
-      todoList = todos.findAllByOrderByCreatedAtDesc();
+      todoList = todos.findByUserIdOrderByCreatedAtDesc(currentClientId);
     }
 
     model.addAttribute("todos", todoList);
@@ -55,10 +74,13 @@ public class TodoController {
 
   @PostMapping("/todos")
   public String create(
+      @CookieValue(value = "todo_client_id", required = false) String clientId,
+      HttpServletResponse response,
       @RequestParam(value = "title", required = false) String title,
       @RequestParam(value = "priority", required = false, defaultValue = "MEDIUM") String priority,
       @RequestParam(value = "dueDate", required = false) String dueDate,
       Model model) {
+    String currentClientId = getOrGenerateClientId(clientId, response);
     if (title == null || title.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "title is required");
     }
@@ -77,7 +99,8 @@ public class TodoController {
         false,
         Todo.Priority.valueOf(priority.toUpperCase()),
         due,
-        Instant.now()
+        Instant.now(),
+        currentClientId
     );
     todos.save(todo);
     model.addAttribute("todo", todo);
@@ -85,10 +108,14 @@ public class TodoController {
   }
 
   @PatchMapping("/todos/{id}/toggle")
-  public String toggle(@PathVariable("id") long id, Model model) {
+  public String toggle(
+      @PathVariable("id") long id,
+      @CookieValue(value = "todo_client_id", required = false) String clientId,
+      Model model) {
+    if (clientId == null) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     Todo todo =
         todos
-            .findById(id)
+            .findByIdAndUserId(id, clientId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     todo.setCompleted(!todo.isCompleted());
     todos.save(todo);
@@ -98,8 +125,11 @@ public class TodoController {
 
   @DeleteMapping("/todos/{id}")
   @ResponseBody
-  public ResponseEntity<Void> delete(@PathVariable("id") long id) {
-    todos.deleteById(id);
+  public ResponseEntity<Void> delete(
+      @PathVariable("id") long id,
+      @CookieValue(value = "todo_client_id", required = false) String clientId) {
+    if (clientId == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    todos.findByIdAndUserId(id, clientId).ifPresent(todo -> todos.deleteById(id));
     return ResponseEntity.ok().build();
   }
 
