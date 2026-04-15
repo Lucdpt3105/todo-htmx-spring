@@ -3,16 +3,14 @@
 </p>
 
 <p align="center">
-  <strong>Production-ready HTMX starter with Java, Spring Boot, Thymeleaf, and PostgreSQL. One-click deploy to Railway.</strong>
+  <strong>Production-ready HTMX todo app with Java, Spring Boot, Thymeleaf, and PostgreSQL. Deploy to Railway in one click.</strong>
 </p>
 
 <p align="center">
   <a href="https://railway.com/deploy/htmxspringthymeleafpostgres">
     <img src="https://railway.com/button.svg" alt="Deploy on Railway">
   </a>
-</p>
-
-<p align="center">
+  &nbsp;
   <a href="https://github.com/atoolz/railway-htmx-java-spring-thymeleaf-pg/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/atoolz/railway-htmx-java-spring-thymeleaf-pg?style=flat-square&color=00c9a7" alt="License">
   </a>
@@ -24,149 +22,72 @@
 
 <br>
 
-## Deploy and Host HTMX + Spring Boot + PostgreSQL Starter on Railway
+## Giới thiệu
 
-HTMX + Spring Boot + PostgreSQL Starter is a production-ready template for hypermedia-driven web apps. It uses HTMX for partial updates, Spring Web + Thymeleaf for server-rendered HTML, JPA + Flyway for persistence, and PostgreSQL. `DATABASE_URL` is parsed from Railway (`postgres://` / `postgresql://`) into a HikariCP datasource. Tailwind and HTMX load from CDN.
+Một todo app hiện đại với HTMX cho dynamic interactions, Spring Boot cho REST API, Thymeleaf cho server-side rendering, và PostgreSQL làm database. Hỗ trợ Docker, Flyway migrations, và sẵn sàng deploy trên Railway.
 
-### About Hosting
+## Công nghệ
 
-Multi-stage **Dockerfile** (Maven build, JRE runtime). Flyway runs migrations on startup. **`GET /health`** returns JSON and checks the database. **`PORT`** defaults to `8080`.
+| Tầng | Công nghệ | Mục đích |
+|------|-----------|---------|
+| **Frontend** | HTMX 2.0.7 + Tailwind (CDN) | Dynamic partial updates |
+| **Templating** | Thymeleaf | Server-side rendering + HTMX fragments |
+| **Backend** | Spring Boot 3.4 + Spring Web | REST API |
+| **Database** | PostgreSQL 16 + JPA + Flyway | ORM + migrations |
 
-### Dependencies for Hosting
-
-- Railway **PostgreSQL** (or compatible URL in `DATABASE_URL`)
-- `DATABASE_URL` = `${{Postgres.DATABASE_URL}}` on the web service
-
-#### Deployment Dependencies
-
-- [HTMX](https://htmx.org/docs/)
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [Thymeleaf](https://www.thymeleaf.org/)
-- [Flyway](https://flywaydb.org/)
-
-### Why Deploy on Railway?
-
-Railway hosts your stack with minimal configuration and scales as you grow.
-
-<br>
-
-## What's Inside
-
-| Layer | Technology | Role |
-|-------|-----------|------|
-| **Frontend** | HTMX 2.0.7 + Tailwind (CDN) | Partial page updates |
-| **Templating** | Thymeleaf | SSR + fragments for HTMX swaps |
-| **API** | Spring Web | REST + HTML responses |
-| **Database** | PostgreSQL + JPA + Flyway | Entities, migrations |
-
-<br>
-
-## Project Structure
+## Cấu trúc Project
 
 ```
-.
-├── src/main/java/com/atoolz/htmx/
-│   ├── HtmxApplication.java
-│   ├── config/RailwayDataSourceConfig.java
-│   └── todo/                    # Entity, repository, controller
-├── src/main/resources/
-│   ├── application.yaml
-│   ├── db/migration/V1__todos.sql
-│   └── templates/
-│       ├── home.html
-│       └── fragments/todo-item.html
-├── pom.xml
-└── Dockerfile
+src/main/java/com/atoolz/htmx/
+├── HtmxApplication.java
+├── config/RailwayDataSourceConfig.java
+└── todo/                          # Entity, repository, controller
+    ├── Todo.java
+    ├── TodoRepository.java
+    └── TodoController.java
+
+src/main/resources/
+├── application.yaml
+├── db/migration/V1__todos.sql
+└── templates/
+    ├── home.html
+    └── fragments/todo-item.html
 ```
 
-<br>
+## Features
 
-## HTMX Patterns Demonstrated
-
-- **`hx-post`**, **`hx-patch`**, **`hx-delete`** with `hx-target` / `hx-swap`
-- **Health check** — `GET /health`
-
-<br>
+- ✅ Dynamic todo list (create, update, delete) với HTMX - không reload page
+- ✅ Server-side rendering bằng Thymeleaf
+- ✅ REST API với Spring Boot
+- ✅ Database migrations với Flyway
+- ✅ Health check endpoint (`GET /health`)
+- ✅ Docker + Docker Compose support
+- ✅ One-click deploy trên Railway
 
 ## Deploy to Railway
 
-1. Fork this repo (or connect it)
-2. New project → add **PostgreSQL**
-3. Add a **web** service from this repo (Dockerfile root)
-4. Set `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`
-5. Health check path: **`/health`**
-
-<br>
+1. Fork repo này hoặc kết nối với Railway
+2. New project → thêm **PostgreSQL** plugin
+3. Thêm **web service** từ repo (Dockerfile ở root)
+4. Set `DATABASE_URL = ${{Postgres.DATABASE_URL}}`
+5. Health check: **`/health`**
 
 ## Local Development
 
 ```bash
-# Java 21 + Maven + local PostgreSQL
+# Cần: Java 21, Maven, PostgreSQL
 export DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
 mvn spring-boot:run
 ```
 
-Open [http://localhost:8080](http://localhost:8080).
+Mở [http://localhost:8080](http://localhost:8080)
 
-<br>
+## Biến môi trường
 
-## Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DATABASE_URL` | Yes | - | PostgreSQL URL (`postgres://` or `postgresql://`); on Railway reference `${{Postgres.DATABASE_URL}}` |
+| Biến | Bắt buộc | Mặc định | Chi tiết |
+|------|----------|---------|---------|
+| `DATABASE_URL` | Yes | - | PostgreSQL URL (postgres:// hoặc postgresql://); trên Railway dùng `${{Postgres.DATABASE_URL}}` |
 | `PORT` | No | `8080` | HTTP port |
-
-<br>
-
-## Railway template: PostgreSQL service variables
-
-Use one variable per line when defining the **PostgreSQL** plugin service. The **web** service typically references the plugin’s canonical URL (see last lines). Generate **`POSTGRES_PASSWORD`** with Railway’s secret helper — do not commit real passwords.
-
-**Template icon (Railway):** [assets/icon.svg](https://raw.githubusercontent.com/atoolz/railway-htmx-java-spring-thymeleaf-pg/master/assets/icon.svg)
-
-```bash
-PGDATA="" # data directory (volume); often set by the image
-PGHOST="${{RAILWAY_PRIVATE_DOMAIN}}" # private hostname for other Railway services
-PGPORT="" # omit for default 5432, or set explicitly
-PGUSER="${{POSTGRES_USER}}" # DB role; keep aligned with POSTGRES_USER
-PGDATABASE="${{POSTGRES_DB}}" # database name
-PGPASSWORD="${{POSTGRES_PASSWORD}}" # password for PGUSER
-POSTGRES_DB="" # DB created on first init (official image / plugin)
-DATABASE_URL="postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}" # in-cluster connection string
-POSTGRES_USER="" # superuser name on first init
-SSL_CERT_DAYS="" # optional TLS cert lifetime if you generate certs
-POSTGRES_PASSWORD="${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}" # generated root password
-DATABASE_PUBLIC_URL="postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_TCP_PROXY_DOMAIN}}:${{RAILWAY_TCP_PROXY_PORT}}/${{PGDATABASE}}" # TCP proxy for external clients
-RAILWAY_DEPLOYMENT_DRAINING_SECONDS="" # drain window during deploys
-
-# Web service (Spring Boot) — reference the Postgres plugin:
-DATABASE_URL="${{Postgres.DATABASE_URL}}" # postgres:// or postgresql://; parsed by RailwayDataSourceConfig
-```
-
-<br>
-
-## Part of the HTMX Railway Collection
-
-This is one of 15 HTMX starter templates covering different backend stacks, all following the same pattern and ready for Railway deployment:
-
-| Stack | Status |
-|-------|--------|
-| Bun + Elysia | Coming soon |
-| .NET + Razor | Coming soon |
-| Elixir + Phoenix | Coming soon |
-| Go + Chi | [Live](https://github.com/atoolz/railway-htmx-go-templ-chi-pg) |
-| Go + Echo | [Live](https://github.com/atoolz/railway-htmx-go-templ-echo-pg) |
-| Go + Fiber | [Live](https://github.com/atoolz/railway-htmx-go-templ-fiber-pg) |
-| Java + Spring Boot (MySQL) | [Live](https://github.com/atoolz/railway-htmx-java-spring-thymeleaf-mysql) |
-| **Java + Spring Boot (PostgreSQL)** | **This repo** |
-| Node + Express | [Live](https://github.com/atoolz/railway-htmx-node-express-ejs-pg) |
-| Node + Hono | [Live](https://github.com/atoolz/railway-htmx-node-hono-jsx-pg) |
-| PHP + Laravel | [Live](https://github.com/atoolz/railway-htmx-php-laravel-mysql) |
-| Python + Django | [Live](https://github.com/atoolz/railway-htmx-python-django-pg) |
-| Python + FastAPI | [Live](https://github.com/atoolz/railway-htmx-python-fastapi-jinja2-pg) |
-| Ruby + Rails 8 | [Live](https://github.com/atoolz/railway-htmx-ruby-rails8-pg) |
-| Rust + Axum + Askama | [Live](https://github.com/atoolz/railway-htmx-rust-axum-askama-pg) |
 
 <br>
 
