@@ -26,7 +26,6 @@ public class GlobalExceptionHandler {
     return "error";
   }
 
-  // 404 từ Spring MVC khi không tìm thấy route (Spring Boot 3.x)
   @ExceptionHandler(NoResourceFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public String handleNoResource(NoResourceFoundException ex, Model model) {
@@ -37,12 +36,9 @@ public class GlobalExceptionHandler {
     return "error";
   }
 
-  // Chỉ bắt Exception thuần, KHÔNG bắt các Spring MVC internal exceptions
-  // để tránh conflict với @ResponseBody endpoints (như /health)
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public Object handleGeneral(Exception ex, Model model) {
-    // Bỏ qua các exception của Spring MVC framework — để framework tự xử lý
     if (ex instanceof HttpMessageNotWritableException) {
       throw new RuntimeException(ex); // re-throw để servlet container xử lý
     }
