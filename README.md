@@ -14,7 +14,7 @@
   <a href="https://github.com/atoolz/railway-htmx-java-spring-thymeleaf-pg/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/atoolz/railway-htmx-java-spring-thymeleaf-pg?style=flat-square&color=00c9a7" alt="License">
   </a>
-  <img src="https://img.shields.io/badge/Java-25-ED8B00?style=flat-square" alt="Java 25">
+  <img src="https://img.shields.io/badge/Java-21-ED8B00?style=flat-square" alt="Java 21">
   <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F?style=flat-square" alt="Spring Boot">
   <img src="https://img.shields.io/badge/HTMX-2.0.7-3366CC?style=flat-square" alt="HTMX 2.0.7">
   <img src="https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square" alt="PostgreSQL">
@@ -75,7 +75,7 @@ src/main/resources/
 ## Local Development
 
 ```bash
-# Cần: Java 25, Maven, PostgreSQL
+# Cần: Java 21, Maven, PostgreSQL
 export DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
 export THYMELEAF_CACHE=false
 mvn spring-boot:run
