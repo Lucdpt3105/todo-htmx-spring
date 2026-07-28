@@ -30,7 +30,7 @@ Một todo app hiện đại với HTMX cho dynamic interactions, Spring Boot ch
 
 | Tầng | Công nghệ | Mục đích |
 |------|-----------|---------|
-| **Frontend** | HTMX 2.0.7 + Tailwind (CDN) | Dynamic partial updates |
+| **Frontend** | HTMX 2.0.7 + Tailwind CSS | Dynamic partial updates |
 | **Templating** | Thymeleaf | Server-side rendering + HTMX fragments |
 | **Backend** | Spring Boot 3.4 + Spring Web | REST API |
 | **Database** | PostgreSQL 16 + JPA + Flyway | ORM + migrations |
@@ -77,10 +77,21 @@ src/main/resources/
 ```bash
 # Cần: Java 25, Maven, PostgreSQL
 export DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
+export THYMELEAF_CACHE=false
 mvn spring-boot:run
 ```
 
 Mở [http://localhost:8080](http://localhost:8080)
+
+Khi thay đổi class Tailwind trong template, build lại CSS tĩnh:
+
+```bash
+npm install
+npm run build:css
+```
+
+File `.env` chỉ nên dùng cho local và đã được `.gitignore`. Trên Railway, cấu hình
+biến môi trường trong dashboard; không upload hoặc commit `.env`.
 
 ## Biến môi trường
 
@@ -88,6 +99,8 @@ Mở [http://localhost:8080](http://localhost:8080)
 |------|----------|---------|---------|
 | `DATABASE_URL` | Yes | - | PostgreSQL URL (postgres:// hoặc postgresql://); trên Railway dùng `${{Postgres.DATABASE_URL}}` |
 | `PORT` | No | `8080` | HTTP port |
+| `THYMELEAF_CACHE` | No | `true` | Đặt `false` khi phát triển local để thấy thay đổi template ngay |
+| `APP_LOG_LEVEL` | No | `INFO` | Có thể đặt `DEBUG` tạm thời khi cần chẩn đoán |
 
 <br>
 
