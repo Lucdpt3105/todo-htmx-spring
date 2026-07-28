@@ -1,5 +1,13 @@
 server:
   port: ${PORT:8080}
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types:
+      - text/html
+      - text/css
+      - application/javascript
+      - application/json
 
 spring:
   jpa:
@@ -12,11 +20,17 @@ spring:
         jdbc:
           time_zone: UTC
   thymeleaf:
-    cache: false
+    cache: ${THYMELEAF_CACHE:true}
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 7d
+          cache-public: true
   flyway:
     enabled: true
 
 logging:
   level:
     root: INFO
-    com.atoolz.htmx: DEBUG
+    com.atoolz.htmx: ${APP_LOG_LEVEL:INFO}

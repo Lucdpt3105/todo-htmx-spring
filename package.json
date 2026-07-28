@@ -1,0 +1,10 @@
+{
+  "name": "htmx-spring-thymeleaf-pg-assets",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/main/resources/styles/app.css -o ./src/main/resources/static/css/app.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
